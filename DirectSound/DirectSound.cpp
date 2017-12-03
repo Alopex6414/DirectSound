@@ -1,13 +1,14 @@
 /*
 *     COPYRIGHT NOTICE
-*     Copyright(c) 2017, Alopex/Helium
+*     Copyright(c) 2017, Team Shanghai Dream Equinox
 *     All rights reserved.
 *
 * @file		DirectSound.cpp
 * @brief	This Program is DirectSound DLL Project.
 * @author	Alopex/Helium
 * @version	v1.00a
-* @date		2017-10-31
+* @date		2017-10-31	v1.00a	alopex	Create Project
+* @date		2017-12-03	v1.01a	alopex	Add Enum
 */
 #include "DirectCommon.h"
 #include "DirectSound.h"
@@ -74,6 +75,46 @@ HRESULT WINAPI DirectSound::DirectSoundInit(HWND hWnd, DWORD dwSoundCoopFlags)
 {
 	//创建IDirectSound8接口对象
 	VERIFY(DirectSoundCreate8(NULL, &m_pDirectSound, NULL));//创建IDirectSound8接口对象
+	VERIFY(m_pDirectSound->SetCooperativeLevel(hWnd, dwSoundCoopFlags));//设置DirectSound协作级别
+
+	return S_OK;//OK
+}
+
+//------------------------------------------------------------------------------------
+// @Function:	DirectSoundInit(HWND hWnd, DirectSoundCoopFlags eDirectSoundCoopFlags)
+// @Purpose: DirectSound 初始化
+// @Since: v1.00a
+// @Para: HWND hWnd(窗口句柄)
+// @Para: DirectSoundCoopFlags eDirectSoundCoopFlags(枚举类型:声音协作级别)
+// @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
+//------------------------------------------------------------------------------------
+HRESULT WINAPI DirectSound::DirectSoundInit(HWND hWnd, DirectSoundCoopFlags eDirectSoundCoopFlags)
+{
+	DWORD dwSoundCoopFlags;
+
+	//创建IDirectSound8接口对象
+	VERIFY(DirectSoundCreate8(NULL, &m_pDirectSound, NULL));//创建IDirectSound8接口对象
+
+	//填充设备协作级别
+	switch (eDirectSoundCoopFlags)
+	{
+	case DSCoopFlags_Normal:
+		dwSoundCoopFlags = DSSCL_NORMAL;
+		break;
+	case DSCoopFlags_Priority:
+		dwSoundCoopFlags = DSSCL_PRIORITY;
+		break;
+	case DSCoopFlags_Exclusive:
+		dwSoundCoopFlags = DSSCL_EXCLUSIVE;
+		break;
+	case DSCoopFlags_WritePrimary:
+		dwSoundCoopFlags = DSSCL_WRITEPRIMARY;
+		break;
+	default:
+		break;
+	}
+
+	//设置DirectSound协作级别
 	VERIFY(m_pDirectSound->SetCooperativeLevel(hWnd, dwSoundCoopFlags));//设置DirectSound协作级别
 
 	return S_OK;//OK
