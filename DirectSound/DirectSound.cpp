@@ -6,9 +6,10 @@
 * @file		DirectSound.cpp
 * @brief	This Program is DirectSound DLL Project.
 * @author	Alopex/Helium
-* @version	v1.00a
+* @version	v1.11a
 * @date		2017-10-31	v1.00a	alopex	Create Project
 * @date		2017-12-03	v1.01a	alopex	Add Enum
+* @date		2017-12-8	v1.11a	alopex	Code Do Not Rely On MSVCR Library
 */
 #include "DirectCommon.h"
 #include "DirectSound.h"
