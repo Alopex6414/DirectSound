@@ -6,13 +6,16 @@
 * @file		DirectSound.cpp
 * @brief	This Program is DirectSound DLL Project.
 * @author	Alopex/Helium
-* @version	v1.11a
+* @version	v1.21a
 * @date		2017-10-31	v1.00a	alopex	Create Project
 * @date		2017-12-03	v1.01a	alopex	Add Enum
 * @date		2017-12-8	v1.11a	alopex	Code Do Not Rely On MSVCR Library
+* @date		2018-1-10	v1.20a	alopex	Code Add dxerr & d3dcompiler Library and Modify Verify.
+* @date		2018-1-10	v1.21a	alopex	Add Thread Safe File & Variable(DirectThreadSafe).
 */
 #include "DirectCommon.h"
 #include "DirectSound.h"
+#include "DirectThreadSafe.h"
 
 //------------------------------------------------------------------
 // @Function:	 DirectSound()
@@ -23,6 +26,9 @@
 //------------------------------------------------------------------
 DirectSound::DirectSound()
 {
+	m_bThreadSafe = true;//线程安全
+	if (m_bThreadSafe) InitializeCriticalSection(&m_cs);//初始化临界区
+
 	m_pDirectSound = NULL;//IDirectSound8接口对象指针初始化(NULL)
 	m_pDirectSoundBuffer = NULL;//IDirectSoundBuffer接口对象指针初始化(NULL)
 	m_pDirectSoundPrimary = NULL;//IDirectSoundBuffer接口对象指针初始化(NULL)(主缓冲区)
@@ -41,11 +47,13 @@ DirectSound::DirectSound()
 //------------------------------------------------------------------
 DirectSound::~DirectSound()
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	SAFE_RELEASE(m_pDirectSound3DListener);//IDirectSound3DListener释放
 	SAFE_RELEASE(m_pDirectSound3DBuffer);//IDirectSound3DBuffer释放
 	SAFE_RELEASE(m_pDirectSoundPrimary);//IDirectSoundBuffer释放(主缓冲区)
 	SAFE_RELEASE(m_pDirectSoundBuffer);//IDirectSoundBuffer释放
 	SAFE_RELEASE(m_pDirectSound);//IDirectSound释放
+	if (m_bThreadSafe) DeleteCriticalSection(&m_cs);//删除临界区
 }
 
 //------------------------------------------------------------------------
@@ -57,6 +65,8 @@ DirectSound::~DirectSound()
 //------------------------------------------------------------------------
 HRESULT WINAPI DirectSound::DirectSoundInit(HWND hWnd)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
+
 	//创建IDirectSound8接口对象
 	VERIFY(DirectSoundCreate8(NULL, &m_pDirectSound, NULL));//创建IDirectSound8接口对象
 	VERIFY(m_pDirectSound->SetCooperativeLevel(hWnd, DSSCL_NORMAL));//设置DirectSound协作级别(Normal模式)
@@ -74,6 +84,8 @@ HRESULT WINAPI DirectSound::DirectSoundInit(HWND hWnd)
 //------------------------------------------------------------------------
 HRESULT WINAPI DirectSound::DirectSoundInit(HWND hWnd, DWORD dwSoundCoopFlags)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
+
 	//创建IDirectSound8接口对象
 	VERIFY(DirectSoundCreate8(NULL, &m_pDirectSound, NULL));//创建IDirectSound8接口对象
 	VERIFY(m_pDirectSound->SetCooperativeLevel(hWnd, dwSoundCoopFlags));//设置DirectSound协作级别
@@ -91,6 +103,7 @@ HRESULT WINAPI DirectSound::DirectSoundInit(HWND hWnd, DWORD dwSoundCoopFlags)
 //------------------------------------------------------------------------------------
 HRESULT WINAPI DirectSound::DirectSoundInit(HWND hWnd, DirectSoundCoopFlags eDirectSoundCoopFlags)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	DWORD dwSoundCoopFlags;
 
 	//创建IDirectSound8接口对象
@@ -130,6 +143,8 @@ HRESULT WINAPI DirectSound::DirectSoundInit(HWND hWnd, DirectSoundCoopFlags eDir
 //------------------------------------------------------------------------
 HRESULT WINAPI DirectSound::DirectSound3DInit(HWND hWnd)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
+
 	//创建IDirectSound8接口对象
 	VERIFY(DirectSoundCreate8(NULL, &m_pDirectSound, NULL));//创建IDirectSound8接口对象
 	VERIFY(m_pDirectSound->SetCooperativeLevel(hWnd, DSSCL_PRIORITY));//设置DirectSound协作级别(Priority模式)
@@ -154,6 +169,7 @@ HRESULT WINAPI DirectSound::DirectSound3DInit(HWND hWnd)
 //------------------------------------------------------------------------
 HRESULT WINAPI DirectSound::DirectSoundLoadWave(LPWSTR lpszFileName)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	HMMIO hWave;
 	MMCKINFO Parent;
 	MMCKINFO Child;
@@ -272,6 +288,7 @@ HRESULT WINAPI DirectSound::DirectSoundLoadWave(LPWSTR lpszFileName)
 //------------------------------------------------------------------------
 HRESULT WINAPI DirectSound::DirectSoundLoad3DWave(LPWSTR lpszFileName)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	HMMIO hWave;
 	MMCKINFO Parent;
 	MMCKINFO Child;
@@ -402,6 +419,7 @@ HRESULT WINAPI DirectSound::DirectSoundLoad3DWave(LPWSTR lpszFileName)
 //------------------------------------------------------------------------
 void WINAPI DirectSound::DirectSoundPlay(void)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	m_pDirectSoundBuffer->Play(NULL, NULL, NULL);//单次播放 Once
 }
 
@@ -414,6 +432,8 @@ void WINAPI DirectSound::DirectSoundPlay(void)
 //------------------------------------------------------------------------
 void WINAPI DirectSound::DirectSoundPlay(DirectSoundPlayState eDSPlayState_X)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
+
 	switch (eDSPlayState_X)
 	{
 	case DSPlayState_Loop://Loop
@@ -436,6 +456,7 @@ void WINAPI DirectSound::DirectSoundPlay(DirectSoundPlayState eDSPlayState_X)
 //------------------------------------------------------------------------
 void WINAPI DirectSound::DirectSoundPlayOnce(void)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	m_pDirectSoundBuffer->Play(NULL, NULL, NULL);//单次播放 Once
 }
 
@@ -448,6 +469,7 @@ void WINAPI DirectSound::DirectSoundPlayOnce(void)
 //------------------------------------------------------------------------
 void WINAPI DirectSound::DirectSoundPlayLoop(void)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	m_pDirectSoundBuffer->Play(NULL, NULL, DSBPLAY_LOOPING);//循环播放 Loop
 }
 
@@ -460,6 +482,7 @@ void WINAPI DirectSound::DirectSoundPlayLoop(void)
 //------------------------------------------------------------------------
 void WINAPI DirectSound::DirectSoundStop(void)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	m_pDirectSoundBuffer->Stop();//停止播放
 }
 
@@ -472,6 +495,8 @@ void WINAPI DirectSound::DirectSoundStop(void)
 //------------------------------------------------------------------------
 void WINAPI DirectSound::DirectSoundSetVolume(LONG lVolume)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
+
 	if (lVolume < DSBVOLUME_MIN)
 	{
 		lVolume = DSBVOLUME_MIN;
@@ -493,6 +518,8 @@ void WINAPI DirectSound::DirectSoundSetVolume(LONG lVolume)
 //------------------------------------------------------------------------
 void WINAPI DirectSound::DirectSoundSetFrequency(DWORD dwFrequency)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
+
 	if (dwFrequency < DSBFREQUENCY_MIN)
 	{
 		dwFrequency = DSBFREQUENCY_MIN;
@@ -514,6 +541,8 @@ void WINAPI DirectSound::DirectSoundSetFrequency(DWORD dwFrequency)
 //------------------------------------------------------------------------
 void WINAPI DirectSound::DirectSoundSetPan(LONG lPan)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
+
 	if (lPan < DSBPAN_LEFT)
 	{
 		lPan = DSBPAN_LEFT;
@@ -535,5 +564,6 @@ void WINAPI DirectSound::DirectSoundSetPan(LONG lPan)
 //------------------------------------------------------------------------
 void WINAPI DirectSound::DirectSoundSetCurrentPosition(DWORD dwNewPositon)
 {
+	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	m_pDirectSoundBuffer->SetCurrentPosition(dwNewPositon);
 }

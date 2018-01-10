@@ -6,10 +6,12 @@
 * @file		DirectSound.h
 * @brief	This Program is DirectSound DLL Project.
 * @author	Alopex/Helium
-* @version	v1.11a
+* @version	v1.21a
 * @date		2017-10-31	v1.00a	alopex	Create Project
 * @date		2017-12-03	v1.01a	alopex	Add Enum
 * @date		2017-12-8	v1.11a	alopex	Code Do Not Rely On MSVCR Library
+* @date		2018-1-10	v1.20a	alopex	Code Add dxerr & d3dcompiler Library and Modify Verify.
+* @date		2018-1-10	v1.21a	alopex	Add Thread Safe File & Variable(DirectThreadSafe).
 */
 #pragma once
 
@@ -55,6 +57,9 @@ private:
 
 	DSBUFFERDESC m_DSPrimaryDesc;	//DirectSount Wave Buffer(Main)(主缓冲)
 	DSBUFFERDESC m_DSBufferDesc;	//DirectSount Wave Buffer(副缓冲)
+
+	CRITICAL_SECTION m_cs;			//Thread Safe(CriticalSection)
+	bool m_bThreadSafe;				//Thread Safe Status
 
 public:
 	DirectSound();	//DirectSound Constructor Function(构造函数)
