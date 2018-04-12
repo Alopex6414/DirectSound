@@ -6,12 +6,13 @@
 * @file		DirectSound.cpp
 * @brief	This Program is DirectSound DLL Project.
 * @author	Alopex/Helium
-* @version	v1.21a
+* @version	v1.22a
 * @date		2017-10-31	v1.00a	alopex	Create Project
 * @date		2017-12-03	v1.01a	alopex	Add Enum
 * @date		2017-12-8	v1.11a	alopex	Code Do Not Rely On MSVCR Library
 * @date		2018-1-10	v1.20a	alopex	Code Add dxerr & d3dcompiler Library and Modify Verify.
 * @date		2018-1-10	v1.21a	alopex	Add Thread Safe File & Variable(DirectThreadSafe).
+* @date		2018-4-12	v1.22a	alopex	Add Macro Call Mode.
 */
 #include "DirectCommon.h"
 #include "DirectSound.h"
@@ -63,7 +64,7 @@ DirectSound::~DirectSound()
 // @Para: HWND hWnd(窗口句柄)
 // @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
 //------------------------------------------------------------------------
-HRESULT WINAPI DirectSound::DirectSoundInit(HWND hWnd)
+HRESULT DIRECTSOUND_CALLMODE DirectSound::DirectSoundInit(HWND hWnd)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 
@@ -82,7 +83,7 @@ HRESULT WINAPI DirectSound::DirectSoundInit(HWND hWnd)
 // @Para: DWORD dwSoundCoopFlags(声音协作级别)
 // @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
 //------------------------------------------------------------------------
-HRESULT WINAPI DirectSound::DirectSoundInit(HWND hWnd, DWORD dwSoundCoopFlags)
+HRESULT DIRECTSOUND_CALLMODE DirectSound::DirectSoundInit(HWND hWnd, DWORD dwSoundCoopFlags)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 
@@ -101,7 +102,7 @@ HRESULT WINAPI DirectSound::DirectSoundInit(HWND hWnd, DWORD dwSoundCoopFlags)
 // @Para: DirectSoundCoopFlags eDirectSoundCoopFlags(枚举类型:声音协作级别)
 // @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
 //------------------------------------------------------------------------------------
-HRESULT WINAPI DirectSound::DirectSoundInit(HWND hWnd, DirectSoundCoopFlags eDirectSoundCoopFlags)
+HRESULT DIRECTSOUND_CALLMODE DirectSound::DirectSoundInit(HWND hWnd, DirectSoundCoopFlags eDirectSoundCoopFlags)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	DWORD dwSoundCoopFlags;
@@ -141,7 +142,7 @@ HRESULT WINAPI DirectSound::DirectSoundInit(HWND hWnd, DirectSoundCoopFlags eDir
 // @Para: HWND hWnd(窗口句柄)
 // @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
 //------------------------------------------------------------------------
-HRESULT WINAPI DirectSound::DirectSound3DInit(HWND hWnd)
+HRESULT DIRECTSOUND_CALLMODE DirectSound::DirectSound3DInit(HWND hWnd)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 
@@ -167,7 +168,7 @@ HRESULT WINAPI DirectSound::DirectSound3DInit(HWND hWnd)
 // @Para: LPWSTR lpszFileName(Wave音源文件相对地址)
 // @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
 //------------------------------------------------------------------------
-HRESULT WINAPI DirectSound::DirectSoundLoadWave(LPWSTR lpszFileName)
+HRESULT DIRECTSOUND_CALLMODE DirectSound::DirectSoundLoadWave(LPWSTR lpszFileName)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	HMMIO hWave;
@@ -286,7 +287,7 @@ HRESULT WINAPI DirectSound::DirectSoundLoadWave(LPWSTR lpszFileName)
 // @Para: LPWSTR lpszFileName(Wave音源文件相对地址)
 // @Return: HRESULT(初始化状态:成功:S_OK,失败:E_FAIL)
 //------------------------------------------------------------------------
-HRESULT WINAPI DirectSound::DirectSoundLoad3DWave(LPWSTR lpszFileName)
+HRESULT DIRECTSOUND_CALLMODE DirectSound::DirectSoundLoad3DWave(LPWSTR lpszFileName)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	HMMIO hWave;
@@ -417,7 +418,7 @@ HRESULT WINAPI DirectSound::DirectSoundLoad3DWave(LPWSTR lpszFileName)
 // @Para: None
 // @Return: None
 //------------------------------------------------------------------------
-void WINAPI DirectSound::DirectSoundPlay(void)
+void DIRECTSOUND_CALLMODE DirectSound::DirectSoundPlay(void)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	m_pDirectSoundBuffer->Play(NULL, NULL, NULL);//单次播放 Once
@@ -430,7 +431,7 @@ void WINAPI DirectSound::DirectSoundPlay(void)
 // @Para: DirectSoundPlayState eDSPlayState_X(播放状态)
 // @Return: None
 //------------------------------------------------------------------------
-void WINAPI DirectSound::DirectSoundPlay(DirectSoundPlayState eDSPlayState_X)
+void DIRECTSOUND_CALLMODE DirectSound::DirectSoundPlay(DirectSoundPlayState eDSPlayState_X)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 
@@ -454,7 +455,7 @@ void WINAPI DirectSound::DirectSoundPlay(DirectSoundPlayState eDSPlayState_X)
 // @Para: None
 // @Return: None
 //------------------------------------------------------------------------
-void WINAPI DirectSound::DirectSoundPlayOnce(void)
+void DIRECTSOUND_CALLMODE DirectSound::DirectSoundPlayOnce(void)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	m_pDirectSoundBuffer->Play(NULL, NULL, NULL);//单次播放 Once
@@ -467,7 +468,7 @@ void WINAPI DirectSound::DirectSoundPlayOnce(void)
 // @Para: None
 // @Return: None
 //------------------------------------------------------------------------
-void WINAPI DirectSound::DirectSoundPlayLoop(void)
+void DIRECTSOUND_CALLMODE DirectSound::DirectSoundPlayLoop(void)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	m_pDirectSoundBuffer->Play(NULL, NULL, DSBPLAY_LOOPING);//循环播放 Loop
@@ -480,7 +481,7 @@ void WINAPI DirectSound::DirectSoundPlayLoop(void)
 // @Para: None
 // @Return: None
 //------------------------------------------------------------------------
-void WINAPI DirectSound::DirectSoundStop(void)
+void DIRECTSOUND_CALLMODE DirectSound::DirectSoundStop(void)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	m_pDirectSoundBuffer->Stop();//停止播放
@@ -493,7 +494,7 @@ void WINAPI DirectSound::DirectSoundStop(void)
 // @Para: LONG lVolume(-10000~0)
 // @Return: None
 //------------------------------------------------------------------------
-void WINAPI DirectSound::DirectSoundSetVolume(LONG lVolume)
+void DIRECTSOUND_CALLMODE DirectSound::DirectSoundSetVolume(LONG lVolume)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 
@@ -516,7 +517,7 @@ void WINAPI DirectSound::DirectSoundSetVolume(LONG lVolume)
 // @Para: DWORD dwFrequency(100Hz~200,000Hz)
 // @Return: None
 //------------------------------------------------------------------------
-void WINAPI DirectSound::DirectSoundSetFrequency(DWORD dwFrequency)
+void DIRECTSOUND_CALLMODE DirectSound::DirectSoundSetFrequency(DWORD dwFrequency)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 
@@ -539,7 +540,7 @@ void WINAPI DirectSound::DirectSoundSetFrequency(DWORD dwFrequency)
 // @Para: LONG lPan
 // @Return: None
 //------------------------------------------------------------------------
-void WINAPI DirectSound::DirectSoundSetPan(LONG lPan)
+void DIRECTSOUND_CALLMODE DirectSound::DirectSoundSetPan(LONG lPan)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 
@@ -562,7 +563,7 @@ void WINAPI DirectSound::DirectSoundSetPan(LONG lPan)
 // @Para: DWORD dwNewPositon(播放位置)
 // @Return: None
 //------------------------------------------------------------------------
-void WINAPI DirectSound::DirectSoundSetCurrentPosition(DWORD dwNewPositon)
+void DIRECTSOUND_CALLMODE DirectSound::DirectSoundSetCurrentPosition(DWORD dwNewPositon)
 {
 	DirectThreadSafe ThreadSafe(&m_cs, m_bThreadSafe);
 	m_pDirectSoundBuffer->SetCurrentPosition(dwNewPositon);
