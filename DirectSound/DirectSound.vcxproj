@@ -92,6 +92,10 @@
     <ClInclude Include="DirectCommon.h" />
     <ClInclude Include="DirectSound.h" />
     <ClInclude Include="DirectThreadSafe.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DirectSound.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
